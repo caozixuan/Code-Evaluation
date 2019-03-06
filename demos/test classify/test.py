@@ -23,8 +23,8 @@ def processDirectory(dirname):
 def load_code(file_dir):
     contents = []
     files_names = []
-    listdir('data\\one',files_names)
-    listdir('data\\two', files_names)
+    listdir('data\\svm',files_names)
+    listdir('data\\fp', files_names)
     return files_names
 
 
@@ -39,7 +39,7 @@ def listdir(path, list_name):  # 传入存储的list
 
 import pickle
 def test_classify():
-    model_path = "model/model_doc2vec"#"model/wiki_en_doc2vec.model.bin"
+    model_path ="model/wiki_en_doc2vec.model.bin"#"model/wiki_en_doc2vec.model.bin" # "model/model_doc2vec"#"
     model = Doc2Vec.load(model_path)
     file_names = load_code('data')
     vectors = []
@@ -50,12 +50,24 @@ def test_classify():
         targets,string = process_code(targets)
         vector = model.infer_vector(targets, steps=6, alpha=0.025)
         sims = model.docvecs.most_similar([vector], topn=10)
-        print(sens[sims[0][0]])
-        print(sims[0][0])
+        #print(sens[sims[0][0]])
+        #print(sims[0][0])
         vectors.append(vector)
-    centroid = kmeans(vectors, 2)[0]
-    label = vq(vectors, centroid)[0]
+    vectors = np.array(vectors)
+    from sklearn.decomposition import PCA
+    pca = PCA(n_components=2)
+    pca.fit(vectors)
+    import matplotlib.pyplot as plt
+    new_vectors = pca.transform(vectors)
+    centroid = kmeans(new_vectors, 2)[0]
+    label = vq(new_vectors, centroid)[0]
+    for i in range(0,len(new_vectors)):
+        if i<=len(new_vectors)/2:
+            plt.scatter(new_vectors[i][0],new_vectors[i][1],c='r')
+        else:
+            plt.scatter(new_vectors[i][0], new_vectors[i][1], c='b')
     print(label)
+    plt.show()
 
 
 import re
