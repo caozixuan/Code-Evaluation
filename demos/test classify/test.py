@@ -23,8 +23,9 @@ def processDirectory(dirname):
 def load_code(file_dir):
     contents = []
     files_names = []
-    listdir('data\\svm',files_names)
-    listdir('data\\fp', files_names)
+    listdir('data\\fp',files_names)
+    listdir('data\\ap', files_names)
+    listdir('data\\svm', files_names)
     return files_names
 
 
@@ -55,17 +56,23 @@ def test_classify():
         vectors.append(vector)
     vectors = np.array(vectors)
     from sklearn.decomposition import PCA
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=3)
     pca.fit(vectors)
     import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
     new_vectors = pca.transform(vectors)
-    centroid = kmeans(new_vectors, 2)[0]
+    centroid = kmeans(new_vectors, 3)[0]
     label = vq(new_vectors, centroid)[0]
     for i in range(0,len(new_vectors)):
-        if i<=len(new_vectors)/2:
-            plt.scatter(new_vectors[i][0],new_vectors[i][1],c='r')
+        #ax.scatter(new_vectors[i][0], new_vectors[i][1], new_vectors[i][2], c='r')
+        if i<30:
+            ax.scatter(new_vectors[i][0],new_vectors[i][1],new_vectors[i][2],c='r')
+        elif i<47:
+            ax.scatter(new_vectors[i][0], new_vectors[i][1], new_vectors[i][2], c='y')
         else:
-            plt.scatter(new_vectors[i][0], new_vectors[i][1], c='b')
+            ax.scatter(new_vectors[i][0], new_vectors[i][1], new_vectors[i][2], c='b')
     print(label)
     plt.show()
 
@@ -93,7 +100,13 @@ def process_code(targets):
     return results,final_string
 
 
+def test():
+    with open("emb.p", 'rb') as f:
+        embedding_matrix = pickle.load(f)
+    print(embedding_matrix)
+
 if __name__ == '__main__':
     test_classify()
+    #test()
     #processDirectory('codeSet')
     #process_code("testCal")
